@@ -12,12 +12,21 @@ public class TouristAttractionService : ITouristAttractionService
     private readonly ITouristAttractionRepository _repository;
     private readonly ILogger<TouristAttractionService> _logger;
     private readonly IProvider _provider;
+
     public TouristAttractionService(ITouristAttractionRepository repository, ILogger<TouristAttractionService> logger, IProvider provider)
     {
         _repository = repository;
         _logger = logger;
         _provider = provider;
     }
+
+    public async Task<IReadOnlyCollection<TouristAttractionListItemDto>> ListPagedAsync(PagedTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Fazendo chamada do listar paginado dos pontos turísticos: Pagina={PageNumber} & CampoBusca={Search}", dto.PageNumber, dto.Search);
+
+        return await _repository.ListPagedAsync(dto, ct);
+    }
+
     public async Task<Guid> CreateAsync(CreateTouristAttractionDto dto, CancellationToken ct)
     {
         var entity = new TouristAttractionEntity(
@@ -32,5 +41,20 @@ public class TouristAttractionService : ITouristAttractionService
         _logger.LogInformation("Criando o ponto turístico: Id={Id}", entity.Id);
 
         return await _repository.CreateAsync(entity, ct);
+    }
+
+    public async Task<Guid> UpdateAsync(UpdateTouristAttractionDto dto, CancellationToken ct)
+    {
+
+        _logger.LogInformation("Atualizando o ponto turístico: Id={Id}", dto.Id);
+
+        return await _repository.UpdateAsync(dto, ct);
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct)
+    {
+        _logger.LogInformation("Excluindo Service o ponto turístico: Id={Id}", id);
+
+        return await _repository.DeleteAsync(id, ct);
     }
 }

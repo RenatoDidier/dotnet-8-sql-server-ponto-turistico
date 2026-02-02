@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Tourism.Application.Exceptions;
 using Tourism.Application.Interfaces.Tourism;
+using Tourism.Application.Models.Dto;
 using Tourism.Domain.Entities;
 using Tourism.Infrastructure.Contexts;
 
@@ -17,6 +18,37 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
         _context = context;
         _logger = logger;
     }
+
+
+    public async Task<IReadOnlyCollection<TouristAttractionListItemDto>> ListPagedAsync(PagedTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attractions_GetPaged.: Pagina={PageNumber} & CampoBusca={Search}", dto.PageNumber, dto.Search);
+
+        try
+        {
+            var rows = await _context
+                .Set<TouristAttractionListItemDto>()
+                .FromSqlRaw(
+                    "EXEC PRC_Tourist_Attractions_GetPaged @PageNumber, @PageSize, @Search",
+                    new SqlParameter("@PageNumber", dto.PageNumber),
+                    new SqlParameter("@PageSize", dto.PageSize),
+                    new SqlParameter("@Search", (object?)dto.Search ?? DBNull.Value)
+                )
+                .AsNoTracking()
+                .ToListAsync(ct);
+
+            return rows;
+
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao listar os pontos turísticos.",
+                ex);
+        }
+    }
+
+
     public async Task<Guid> CreateAsync(TouristAttractionEntity entity, CancellationToken ct)
     {
         _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Create. Id={Id}", entity.Id);
@@ -27,13 +59,12 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
                 "EXEC PRC_Tourist_Attraction_Create @Id, @Title, @City, @UF, @Reference, @Description",
                 new[]
                 {
-                new SqlParameter("@Id", entity.Id),
-                new SqlParameter("@Title", entity.Title),
-                new SqlParameter("@City", entity.City),
-                new SqlParameter("@UF", entity.UF),
-                new SqlParameter("@Reference", entity.Reference),
-                new SqlParameter("@Description", entity.Description),
-
+                    new SqlParameter("@Id", entity.Id),
+                    new SqlParameter("@Title", entity.Title),
+                    new SqlParameter("@City", entity.City),
+                    new SqlParameter("@UF", entity.UF),
+                    new SqlParameter("@Reference", entity.Reference),
+                    new SqlParameter("@Description", entity.Description),
                 },
                 ct
             );
@@ -47,4 +78,61 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
                 ex);
         }
     }
+
+    public async Task<Guid> UpdateAsync(UpdateTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Update. Id={Id}", dto.Id);
+
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC PRC_Tourist_Attraction_Update @Id, @Title, @City, @UF, @Reference, @Description",
+                new[]
+                {
+                    new SqlParameter("@Id", dto.Id),
+                    new SqlParameter("@Title", dto.Title),
+                    new SqlParameter("@City", dto.City),
+                    new SqlParameter("@UF", dto.UF),
+                    new SqlParameter("@Reference", dto.Reference),
+                    new SqlParameter("@Description", dto.Description),
+                },
+                ct
+            );
+
+            return dto.Id;
+
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao atualizar o ponto turístico.",
+                ex);
+        }
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Delete. Id={Id}", id);
+
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC PRC_Tourist_Attraction_Delete @Id",
+                new[]
+                {
+                      new SqlParameter("@Id", id),
+                },
+                ct
+            );
+
+            return true;
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao excluir o ponto turístico.",
+                ex);
+        }
+    }
+
 }
