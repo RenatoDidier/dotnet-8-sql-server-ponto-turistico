@@ -1,4 +1,6 @@
-﻿namespace Tourism.Domain.Common;
+﻿using Tourism.Domain.Interfaces;
+
+namespace Tourism.Domain.Common;
 
 public class BaseEntity
 {
@@ -8,11 +10,11 @@ public class BaseEntity
     public DateTime? UpdatedAt { get; protected set; }
     
     protected BaseEntity() { }
-    protected BaseEntity(Guid id, string title)
+    protected BaseEntity(string title, IProvider provider)
     {
-        Id = id;
+        Id = provider.NewGuid();
         Title = title;
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = provider.DateTimeUtcNow();
     }
 
     public void UpdateTitle(string title)
