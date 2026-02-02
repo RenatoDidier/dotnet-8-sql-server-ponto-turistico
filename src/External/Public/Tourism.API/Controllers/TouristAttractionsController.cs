@@ -35,4 +35,22 @@ public class TouristAttractionsController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, new { id });
     }
+    [HttpPut(Name = "Update")]
+    public async Task<IActionResult> UpdateTouristAttraction(UpdateTouristAttractionRequest request, CancellationToken ct)
+    {
+        _logger.LogInformation("Atualizando o ponto turístico: Id={Id} Title={Title}",request.Id, request.Title);
+
+        var dto = new UpdateTouristAttractionDto(
+            request.Id,
+            request.Title,
+            request.City,
+            request.UF,
+            request.Reference,
+            request.Description
+        );
+
+        var id = await _service.UpdateAsync(dto, ct);
+
+        return StatusCode(StatusCodes.Status201Created, new { id });
+    }
 }

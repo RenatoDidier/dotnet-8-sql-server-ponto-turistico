@@ -27,13 +27,12 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
                 "EXEC PRC_Tourist_Attraction_Create @Id, @Title, @City, @UF, @Reference, @Description",
                 new[]
                 {
-                new SqlParameter("@Id", entity.Id),
-                new SqlParameter("@Title", entity.Title),
-                new SqlParameter("@City", entity.City),
-                new SqlParameter("@UF", entity.UF),
-                new SqlParameter("@Reference", entity.Reference),
-                new SqlParameter("@Description", entity.Description),
-
+                    new SqlParameter("@Id", entity.Id),
+                    new SqlParameter("@Title", entity.Title),
+                    new SqlParameter("@City", entity.City),
+                    new SqlParameter("@UF", entity.UF),
+                    new SqlParameter("@Reference", entity.Reference),
+                    new SqlParameter("@Description", entity.Description),
                 },
                 ct
             );
@@ -44,6 +43,37 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
         {
             throw new PersistenceException(
                 "Ocorreu um erro ao cadastrar o ponto turístico.",
+                ex);
+        }
+    }
+
+    public async Task<Guid> UpdateAsync(UpdateTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Update. Id={Id}", dto.Id);
+
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC PRC_Tourist_Attraction_Update @Id, @Title, @City, @UF, @Reference, @Description",
+                new[]
+                {
+                    new SqlParameter("@Id", dto.Id),
+                    new SqlParameter("@Title", dto.Title),
+                    new SqlParameter("@City", dto.City),
+                    new SqlParameter("@UF", dto.UF),
+                    new SqlParameter("@Reference", dto.Reference),
+                    new SqlParameter("@Description", dto.Description),
+                },
+                ct
+            );
+
+            return dto.Id;
+
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao atualizar o ponto turístico.",
                 ex);
         }
     }

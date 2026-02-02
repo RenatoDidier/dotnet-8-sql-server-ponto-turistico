@@ -5,4 +5,5 @@ namespace Tourism.Application.Contracts.Tourism;
 public interface ITouristAttractionService
 {
     Task<Guid> CreateAsync(CreateTouristAttractionDto dto, CancellationToken ct);
+    Task<Guid> UpdateAsync(UpdateTouristAttractionDto dto, CancellationToken ct);
 }

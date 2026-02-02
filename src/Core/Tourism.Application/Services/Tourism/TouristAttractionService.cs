@@ -33,4 +33,12 @@ public class TouristAttractionService : ITouristAttractionService
 
         return await _repository.CreateAsync(entity, ct);
     }
+
+    public async Task<Guid> UpdateAsync(UpdateTouristAttractionDto dto, CancellationToken ct)
+    {
+
+        _logger.LogInformation("Atualizando o ponto turístico: Id={Id}", dto.Id);
+
+        return await _repository.UpdateAsync(dto, ct);
+    }
 }
