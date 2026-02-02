@@ -1,0 +1,50 @@
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Tourism.Application.Exceptions;
+using Tourism.Application.Interfaces.Tourism;
+using Tourism.Domain.Entities;
+using Tourism.Infrastructure.Contexts;
+
+namespace Tourism.Infrastructure.Repositories;
+
+public sealed class TouristAttractionRepository : ITouristAttractionRepository
+{
+    private readonly TourismDbContext _context;
+    private readonly ILogger<TouristAttractionRepository> _logger;
+    public TouristAttractionRepository(TourismDbContext context, ILogger<TouristAttractionRepository> logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+    public async Task<Guid> CreateAsync(TouristAttractionEntity entity, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Create. Id={Id}", entity.Id);
+
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC PRC_Tourist_Attraction_Create @Id, @Title, @City, @UF, @Reference, @Description",
+                new[]
+                {
+                new SqlParameter("@Id", entity.Id),
+                new SqlParameter("@Title", entity.Title),
+                new SqlParameter("@City", entity.City),
+                new SqlParameter("@UF", entity.UF),
+                new SqlParameter("@Reference", entity.Reference),
+                new SqlParameter("@Description", entity.Description),
+
+                },
+                ct
+            );
+
+            return entity.Id;
+
+        } catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao cadastrar o ponto turístico.",
+                ex);
+        }
+    }
+}
