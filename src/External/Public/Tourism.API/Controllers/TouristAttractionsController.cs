@@ -19,7 +19,28 @@ public class TouristAttractionsController : ControllerBase
         _service = service;
     }
 
-    [HttpPost("ListTouristAttraction")]
+    [HttpGet("Admin/List")]
+    public async Task<IActionResult> AdminListTouristAttraction(CancellationToken ct)
+    {
+        _logger.LogInformation("Listando os ponto turísticos da aba de administração");
+
+        var dto = new PagedTouristAttractionDto
+        {
+            PageNumber = 1,
+            PageSize = 99999999,
+            Search = ""
+        };
+
+        var result = await _service.ListPagedAsync(dto, ct);
+
+        var response = new AdminTouristAttraction.Response();
+
+        response.AddItems(result);
+
+        return Ok(response);
+    }
+
+    [HttpPost("List")]
     public async Task<IActionResult> PagedTouristAttraction(PagedTouristAttractionRequest request, CancellationToken ct)
     {
         _logger.LogInformation("Listando os ponto turísticos: Pagina={PageNumber} & CampoBusca={Search}", request.PageNumber, request.Search);
@@ -35,7 +56,7 @@ public class TouristAttractionsController : ControllerBase
 
         var totalItems = result.FirstOrDefault()?.TotalItems ?? 0;
 
-        var response = new PagedTouristAttractionResponse.PagedResponse();
+        var response = new PagedTouristAttraction.Response();
 
         response.AddTotalItems(totalItems);
         response.AddItems(result);
