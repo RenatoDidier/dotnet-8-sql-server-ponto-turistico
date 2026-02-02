@@ -12,12 +12,14 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.10.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\External\Tourism.Infrastructure\Tourism.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Core\Tourism.Domain.Test\Tourism.Domain.Test.csproj" />
   </ItemGroup>
 
   <ItemGroup>
