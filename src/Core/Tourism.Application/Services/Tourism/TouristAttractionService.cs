@@ -20,6 +20,13 @@ public class TouristAttractionService : ITouristAttractionService
         _provider = provider;
     }
 
+    public async Task<IReadOnlyCollection<TouristAttractionListItemDto>> ListPagedAsync(PagedTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Fazendo chamada do listar paginado dos pontos turísticos: Pagina={PageNumber} & CampoBusca={Search}", dto.PageNumber, dto.Search);
+
+        return await _repository.ListPagedAsync(dto, ct);
+    }
+
     public async Task<Guid> CreateAsync(CreateTouristAttractionDto dto, CancellationToken ct)
     {
         var entity = new TouristAttractionEntity(

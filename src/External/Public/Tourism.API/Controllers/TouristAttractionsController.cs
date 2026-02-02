@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Tourism.API.Contracts.Requests.Tourism;
+using Tourism.API.Contracts.Responses.Tourism;
 using Tourism.Application.Contracts.Tourism;
 using Tourism.Application.Models.Dto;
 
@@ -16,6 +17,30 @@ public class TouristAttractionsController : ControllerBase
     {
         _logger = logger;
         _service = service;
+    }
+
+    [HttpPost("ListTouristAttraction")]
+    public async Task<IActionResult> PagedTouristAttraction(PagedTouristAttractionRequest request, CancellationToken ct)
+    {
+        _logger.LogInformation("Listando os ponto turísticos: Pagina={PageNumber} & CampoBusca={Search}", request.PageNumber, request.Search);
+
+        var dto = new PagedTouristAttractionDto
+            {
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                Search = request.Search
+            };
+
+        var result = await _service.ListPagedAsync(dto, ct);
+
+        var totalItems = result.FirstOrDefault()?.TotalItems ?? 0;
+
+        var response = new PagedTouristAttractionResponse.PagedResponse();
+
+        response.AddTotalItems(totalItems);
+        response.AddItems(result);
+
+        return Ok(response);
     }
 
     [HttpPost(Name = "Create")]

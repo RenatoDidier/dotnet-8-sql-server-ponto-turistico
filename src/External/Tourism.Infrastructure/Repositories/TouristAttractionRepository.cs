@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Tourism.Application.Exceptions;
 using Tourism.Application.Interfaces.Tourism;
+using Tourism.Application.Models.Dto;
 using Tourism.Domain.Entities;
 using Tourism.Infrastructure.Contexts;
 
@@ -17,6 +18,36 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
         _context = context;
         _logger = logger;
     }
+
+
+    public async Task<IReadOnlyCollection<TouristAttractionListItemDto>> ListPagedAsync(PagedTouristAttractionDto dto, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attractions_GetPaged.: Pagina={PageNumber} & CampoBusca={Search}", dto.PageNumber, dto.Search);
+
+        try
+        {
+            var rows = await _context
+                .Set<TouristAttractionListItemDto>()
+                .FromSqlRaw(
+                    "EXEC PRC_Tourist_Attractions_GetPaged @PageNumber, @PageSize, @Search",
+                    new SqlParameter("@PageNumber", dto.PageNumber),
+                    new SqlParameter("@PageSize", dto.PageSize),
+                    new SqlParameter("@Search", (object?)dto.Search ?? DBNull.Value)
+                )
+                .AsNoTracking()
+                .ToListAsync(ct);
+
+            return rows;
+
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao listar os pontos turísticos.",
+                ex);
+        }
+    }
+
 
     public async Task<Guid> CreateAsync(TouristAttractionEntity entity, CancellationToken ct)
     {

@@ -100,12 +100,55 @@ namespace Tourism.Infrastructure.Migrations
                         WHERE Id = @Id;
                 END
             ");
+
+            migrationBuilder.Sql(@"
+                CREATE PROCEDURE PRC_Tourist_Attractions_GetPaged
+                (
+                    @PageNumber INT,
+                    @PageSize INT,
+                    @Search NVARCHAR(100) = NULL
+                )
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+
+                    ;WITH FilteredData AS
+                    (
+                        SELECT
+                            Id,
+                            Title,
+                            Description,
+                            City,
+                            UF,
+                            Reference,
+                            CreatedAt
+                        FROM TouristAttractions
+                        WHERE
+                            @Search IS NULL
+                            OR Title LIKE '%' + @Search + '%'
+                            OR Description LIKE '%' + @Search + '%'
+                            OR City LIKE '%' + @Search + '%'
+                    )
+                    SELECT
+                        *,
+                        COUNT(1) OVER() AS TotalItems
+                    FROM FilteredData
+                    ORDER BY CreatedAt DESC
+                    OFFSET @Offset ROWS
+                    FETCH NEXT @PageSize ROWS ONLY;
+                END;
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS PRC_Tourist_Attraction_Create");
+            migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS PRC_Tourist_Attraction_Update");
+            migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS PRC_Tourist_Attraction_Delete");
+            migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS PRC_Tourist_Attractions_GetPaged");
             
             migrationBuilder.DropTable(
                 name: "TouristAttractions");
