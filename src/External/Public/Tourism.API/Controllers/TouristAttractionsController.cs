@@ -35,6 +35,7 @@ public class TouristAttractionsController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, new { id });
     }
+
     [HttpPut(Name = "Update")]
     public async Task<IActionResult> UpdateTouristAttraction(UpdateTouristAttractionRequest request, CancellationToken ct)
     {
@@ -53,4 +54,19 @@ public class TouristAttractionsController : ControllerBase
 
         return StatusCode(StatusCodes.Status201Created, new { id });
     }
+
+    [HttpDelete(Name = "Delete/{id:guid}")]
+    public async Task<IActionResult> DeleteTouristAttraction(Guid id, CancellationToken ct)
+    {
+        _logger.LogInformation("Excluindo ponto turístico: Id={Id}", id);
+
+        var deleted = await _service.DeleteAsync(id, ct);
+
+        if (!deleted)
+            return NotFound();
+        
+        return NoContent();
+
+    }
+
 }

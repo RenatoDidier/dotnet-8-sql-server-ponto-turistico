@@ -65,6 +65,41 @@ namespace Tourism.Infrastructure.Migrations
                     );
                 END
             ");
+
+            migrationBuilder.Sql(@"
+                CREATE PROCEDURE PRC_Tourist_Attraction_Update
+                    @Id UNIQUEIDENTIFIER,
+                    @Title NVARCHAR(100),
+                    @City NVARCHAR(100),
+                    @UF NVARCHAR(2),
+                    @Reference NVARCHAR(100),
+                    @Description NVARCHAR(100)
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    UPDATE TouristAttractions
+                        SET Title = @Title,
+                            City = @City,
+                            UF = @UF,
+                            Reference = @Reference,
+                            Description = @Description,
+                            UpdatedAt = SYSUTCDATETIME()
+                    WHERE Id = @Id;
+                END
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE PROCEDURE PRC_Tourist_Attraction_Delete
+                    @Id UNIQUEIDENTIFIER
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    DELETE FROM TouristAttractions
+                        WHERE Id = @Id;
+                END
+            ");
         }
 
         /// <inheritdoc />

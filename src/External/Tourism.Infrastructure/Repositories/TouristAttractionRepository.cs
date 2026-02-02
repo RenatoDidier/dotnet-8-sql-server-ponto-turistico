@@ -17,6 +17,7 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
         _context = context;
         _logger = logger;
     }
+
     public async Task<Guid> CreateAsync(TouristAttractionEntity entity, CancellationToken ct)
     {
         _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Create. Id={Id}", entity.Id);
@@ -77,4 +78,30 @@ public sealed class TouristAttractionRepository : ITouristAttractionRepository
                 ex);
         }
     }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct)
+    {
+        _logger.LogInformation("Executando SP PRC_Tourist_Attraction_Delete. Id={Id}", id);
+
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC PRC_Tourist_Attraction_Delete @Id",
+                new[]
+                {
+                      new SqlParameter("@Id", id),
+                },
+                ct
+            );
+
+            return true;
+        }
+        catch (SqlException ex)
+        {
+            throw new PersistenceException(
+                "Ocorreu um erro ao excluir o ponto turístico.",
+                ex);
+        }
+    }
+
 }
