@@ -1,4 +1,5 @@
 ﻿using Tourism.Domain.Common;
+using Tourism.Domain.Interfaces;
 
 namespace Tourism.Domain.Entities;
 
@@ -18,13 +19,13 @@ public class TouristAttractionEntity : BaseEntity
     protected TouristAttractionEntity() { }
 
     public TouristAttractionEntity(
-        Guid id,
         string title,
         string city,
         string uf,
         string reference,
-        string description)
-        : base(id, title)
+        string description,
+        IProvider provider)
+        : base(title, provider)
     {
         City = city;
         UF = uf;
