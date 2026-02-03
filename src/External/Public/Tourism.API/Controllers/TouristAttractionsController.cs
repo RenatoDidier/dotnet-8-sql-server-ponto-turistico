@@ -101,7 +101,7 @@ public class TouristAttractionsController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, new { id });
     }
 
-    [HttpDelete(Name = "Delete/{id:guid}")]
+    [HttpDelete("Delete/{id:guid}")]
     public async Task<IActionResult> DeleteTouristAttraction(Guid id, CancellationToken ct)
     {
         _logger.LogInformation("Excluindo ponto turístico: Id={Id}", id);
