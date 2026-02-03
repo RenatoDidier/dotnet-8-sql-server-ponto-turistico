@@ -19,6 +19,7 @@ public class PagedTouristAttraction
             Items.AddRange(
                 items.Select(item => new TouristAttractionResponse
                 {
+                    Id = item.Id,
                     Title = item.Title,
                     Description = item.Description,
                     City = item.City,
@@ -32,6 +33,7 @@ public class PagedTouristAttraction
 
 public sealed class TouristAttractionResponse
 {
+    public Guid Id { get; init; } = default!;
     public string Title { get; init; } = default!;
     public string Description { get; init; } = default!;
     public string City { get; init; } = default!;

@@ -19,7 +19,8 @@ public sealed class AdminTouristAttraction
                     Description = item.Description,
                     City = item.City,
                     UF = item.UF,
-                    Reference = item.Reference
+                    Reference = item.Reference,
+                    CreatedAt = item.CreatedAt.ToString("dd/MM/yyyy")
                 })
             );
         }
@@ -35,5 +36,6 @@ public sealed class AdminResponse
     public string City { get; init; } = default!;
     public string UF { get; init; } = default!;
     public string Reference { get; init; } = default!;
+    public string CreatedAt { get; init; } = default!;
 }
  
